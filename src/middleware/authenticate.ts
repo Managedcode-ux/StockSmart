@@ -1,5 +1,5 @@
 import { Request,Response,NextFunction } from "express";
-const jwt = require('jsonwebtoken')
+import jwt from 'jsonwebtoken';
 
 declare module 'express-serve-static-core' {
   export interface Request {

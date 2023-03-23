@@ -5,6 +5,7 @@ import { generateAccessToken } from "../utils/jwt"
 import { validatePassword } from "../service/user.service";
 import { omit } from "lodash";
 import logger from "../utils/logger"
+import { extractUser } from "../utils/getUserdetails";
 
 export async function createUserHandler(req:Request<{},{},CreateUserInput["body"]>,res:Response){
   try{
@@ -14,6 +15,11 @@ export async function createUserHandler(req:Request<{},{},CreateUserInput["body"
     logger.error(e);
     return res.status(400).send(e.message)
   }
+}
+
+export async function getCurrentUserHandler(req:Request,res:Response){
+  const user = extractUser(req)
+  return res.status(200).send(user)  
 }
 
 export async  function loginUserHandler(req:Request,res:Response){
