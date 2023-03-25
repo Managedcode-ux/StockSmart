@@ -1,4 +1,6 @@
 import { omit } from "lodash";
+import bcrypt from "bcrypt";
+
 import UserModel,{userDocument,userInput} from "../models/user.model";
 
 export async function createUser(input:userInput){
@@ -11,24 +13,20 @@ export async function createUser(input:userInput){
 }
 
 export async function updateUser(updateData:Partial<userInput>,currentData:userDocument){
-  console.log("updateData ==>",updateData)
-  console.log("currentData ==>",currentData)
-  
   const user:userDocument|null  = await UserModel.findOne({'email': currentData.email})
-  
-  console.log("FOUND USER ==>",user)
-  
   if(user == null) return false
-
   if(currentData.email != user.email) return false;
+  if("password" in updateData){
+    const workFactor:string = process.env.saltWorkFactor || '10'
+    const salt = await bcrypt.genSalt(parseInt(workFactor))
+    const hash:string = await bcrypt.hashSync(updateData.password,salt)
+    updateData.password = hash
 
-  await UserModel.updateOne({_id:user.id},updateData,{new: true}).exec()
-  .then((response) => {
-         console.log('document after updating =>', response);
-         return response.acknowledged
-  });
-
-  
+  }
+  console.log(updateData.password)
+  const status = await UserModel.updateOne({_id:user.id},updateData,{new: true}).exec()
+  const newData = await UserModel.findById(user._id)
+  return {updatedData:omit(newData?.toJSON(),"password"),status:status.acknowledged}
 }
 
 export async function validatePassword({email,password}:{email:string,password:string}){

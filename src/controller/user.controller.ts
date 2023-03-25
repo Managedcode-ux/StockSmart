@@ -27,8 +27,15 @@ export async function updateCurrentUserHandler(req:Request,res:Response){
   const updateData = req.body
   const user = extractUser(req)
 
-  const updateStatus = await updateUser(updateData,user)
-  console.log("UPDATE STATUS ==>",updateStatus)
+  const data:any  = await updateUser(updateData,user)
+  
+  if(data.status== true){
+    const newAccessToken = await generateAccessToken(data.updatedData)
+    return res.send(newAccessToken).status(200)
+  }
+  else{
+    res.send("Something went wrong").status(500)
+  }
 }
 
 export async  function loginUserHandler(req:Request,res:Response){

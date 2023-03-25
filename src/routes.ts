@@ -21,7 +21,7 @@ function routes(app:Express){
   app.post('/api/createUsers',validateResource(createUserSchema),createUserHandler)
   app.post('/api/loginUser',validateResource(createSessionSchema),loginUserHandler)
   app.get('/api/getCurrentUser',[authenticateToken],getCurrentUserHandler)
-  app.post('/api/updateUser',[authenticateToken],updateCurrentUserHandler)
+  app.patch('/api/updateUser',[authenticateToken],updateCurrentUserHandler)
   // app.post('/api/anyRoute',[authenticateToken],deleteCurrentUser)
 
   
