@@ -1,18 +1,18 @@
 import {Express,Request,Response} from "express";
 
 // USER PATH IMPORTS
-import { createUserHandler,loginUserHandler,getCurrentUserHandler } from "./controller/user.controller";
+import { createUserHandler,loginUserHandler,getCurrentUserHandler,updateCurrentUserHandler} from "./controller/user.controller";
 
 
 //MIDDLEWARE IMPORTS
 import { authenticateToken } from "./middleware/authenticate";
 import validateResource from "./middleware/validateResource";
-import { extractUser } from "./utils/getUserdetails";
-
 
 //SCHEMA IMPORTS
 import { createUserSchema } from "./schema/user.schema";
 import { createSessionSchema } from "./schema/login.user.schema";
+
+
 
 function routes(app:Express){
   app.get('/healthcheck', (req, res) => res.sendStatus(200));
@@ -21,7 +21,7 @@ function routes(app:Express){
   app.post('/api/createUsers',validateResource(createUserSchema),createUserHandler)
   app.post('/api/loginUser',validateResource(createSessionSchema),loginUserHandler)
   app.get('/api/getCurrentUser',[authenticateToken],getCurrentUserHandler)
-  // app.post('/api/anyRoute',[authenticateToken],updateCurrentUser)
+  app.post('/api/updateUser',[authenticateToken],updateCurrentUserHandler)
   // app.post('/api/anyRoute',[authenticateToken],deleteCurrentUser)
 
   

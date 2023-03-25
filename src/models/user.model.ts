@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
+// export interface updateUser{
+//   email: string,
+//   name:string,
+//   password:string,
+// }
+
 export interface userInput
 {
   email: string,
-  name:string,
+  username:string,
   password:string,
 }
 
@@ -17,7 +23,7 @@ export interface userDocument extends userInput,mongoose.Document{
 
 const userSchema = new mongoose.Schema({
   email:{type:String,required:true,unique:true},
-  name:{type:String,required:true},
+  username:{type:String,required:true},
   password:{type:String,required:true}
 },{timestamps: true})
 
@@ -41,6 +47,8 @@ userSchema.pre("save",async function(next){
 
 userSchema.methods.comparePassword = async function (candidatePassword:string):Promise<boolean>{
   const user = this as userDocument
+  console.log("Candidate password ==> ",candidatePassword)
+  console.log("User password ==> ",user.password)
   return bcrypt.compare(candidatePassword,user.password).catch((e)=>false);
 }
 

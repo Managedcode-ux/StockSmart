@@ -1,8 +1,8 @@
 import { Request,Response } from "express";
-import { createUser } from "../service/user.service";
+import { createUser, updateUser } from "../services/user.service";
 import { CreateUserInput } from "../schema/user.schema";
 import { generateAccessToken } from "../utils/jwt"
-import { validatePassword } from "../service/user.service";
+import { validatePassword } from "../services/user.service";
 import { omit } from "lodash";
 import logger from "../utils/logger"
 import { extractUser } from "../utils/getUserdetails";
@@ -20,6 +20,15 @@ export async function createUserHandler(req:Request<{},{},CreateUserInput["body"
 export async function getCurrentUserHandler(req:Request,res:Response){
   const user = extractUser(req)
   return res.status(200).send(user)  
+}
+
+export async function updateCurrentUserHandler(req:Request,res:Response){
+
+  const updateData = req.body
+  const user = extractUser(req)
+
+  const updateStatus = await updateUser(updateData,user)
+  console.log("UPDATE STATUS ==>",updateStatus)
 }
 
 export async  function loginUserHandler(req:Request,res:Response){
