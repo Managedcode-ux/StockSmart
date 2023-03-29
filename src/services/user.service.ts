@@ -16,7 +16,7 @@ export async function updateUser(updateData:Partial<userInput>,currentData:userD
   const user:userDocument|null  = await UserModel.findOne({'email': currentData.email})
   if(user == null) return false
   if(currentData.email != user.email) return false;
-  if("password" in updateData){
+  if("password" in updateData && updateData.password!=null){
     const workFactor:string = process.env.saltWorkFactor || '10'
     const salt = await bcrypt.genSalt(parseInt(workFactor))
     const hash:string = await bcrypt.hashSync(updateData.password,salt)
