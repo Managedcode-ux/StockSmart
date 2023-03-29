@@ -21,9 +21,7 @@ export async function updateUser(updateData:Partial<userInput>,currentData:userD
     const salt = await bcrypt.genSalt(parseInt(workFactor))
     const hash:string = await bcrypt.hashSync(updateData.password,salt)
     updateData.password = hash
-
   }
-  console.log(updateData.password)
   const status = await UserModel.updateOne({_id:user.id},updateData,{new: true}).exec()
   const newData = await UserModel.findById(user._id)
   return {updatedData:omit(newData?.toJSON(),"password"),status:status.acknowledged}

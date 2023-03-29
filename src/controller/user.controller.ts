@@ -31,7 +31,7 @@ export async function updateCurrentUserHandler(req:Request,res:Response){
   
   if(data.status== true){
     const newAccessToken = await generateAccessToken(data.updatedData)
-    return res.send(newAccessToken).status(200)
+    return res.send({Token:newAccessToken,Updated_data:data.updatedData}).status(200)
   }
   else{
     res.send("Something went wrong").status(500)
