@@ -1,7 +1,7 @@
 import {Express,Request,Response} from "express";
 
 // USER PATH IMPORTS
-import { createUserHandler,loginUserHandler,getCurrentUserHandler,updateCurrentUserHandler} from "./controller/user.controller";
+import { createUserHandler,loginUserHandler,getCurrentUserHandler,updateCurrentUserHandler,deleteCurrentUserHandler} from "./controller/user.controller";
 
 
 //MIDDLEWARE IMPORTS
@@ -22,7 +22,7 @@ function routes(app:Express){
   app.post('/api/loginUser',validateResource(createSessionSchema),loginUserHandler)
   app.get('/api/getCurrentUser',[authenticateToken],getCurrentUserHandler)
   app.patch('/api/updateUser',[authenticateToken],updateCurrentUserHandler)
-  // app.post('/api/anyRoute',[authenticateToken],deleteCurrentUser)
+  app.delete('/api/deleteUser',[authenticateToken],deleteCurrentUserHandler)
 
   
   app.post('/api/testRoute',authenticateToken,(req,res)=>{

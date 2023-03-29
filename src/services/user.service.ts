@@ -41,3 +41,18 @@ export async function validatePassword({email,password}:{email:string,password:s
 
   return omit(user.toJSON(), 'password')
 }
+
+export async function deleteUser({email,password}:{email:string,password:string}){
+  const passValidation = await validatePassword({email,password})
+
+  if(passValidation){
+
+    const deletedObj = await UserModel.findOneAndDelete({email:email})
+    
+    if(deletedObj !== null){
+      return ({status:true,message:"Data deleted successfully"})
+    }
+    return ({status:false,message:"Data not found"})
+  }
+  return ({status:false,message:"Wrong Password"})
+}

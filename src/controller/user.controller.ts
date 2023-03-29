@@ -1,5 +1,5 @@
 import { Request,Response } from "express";
-import { createUser, updateUser } from "../services/user.service";
+import { createUser, updateUser, deleteUser } from "../services/user.service";
 import { CreateUserInput } from "../schema/user.schema";
 import { generateAccessToken } from "../utils/jwt"
 import { validatePassword } from "../services/user.service";
@@ -34,7 +34,7 @@ export async function updateCurrentUserHandler(req:Request,res:Response){
     return res.send({Token:newAccessToken,Updated_data:data.updatedData}).status(200)
   }
   else{
-    res.send("Something went wrong").status(500)
+    return res.send("Something went wrong").status(500)
   }
 }
 
@@ -51,8 +51,22 @@ export async  function loginUserHandler(req:Request,res:Response){
     return res.status(403).send("Invalid Email or Password");
   }
   }catch(e:any){
-    console.log("Invalid")
+    logger.error(e)
     return res.status(403).send(e.message)
   }
   
+}
+
+export async function deleteCurrentUserHandler(req:Request, res:Response){
+  try{
+    const data = req.body;
+    const status = await deleteUser(data)
+    if(status.status === true){
+      return res.status(200).send(status.message)
+    }
+    return res.status(400).send(status.message)
+  }catch(err:any){
+    logger.error(err)
+    return res.status(400).send(err.message)
+  }
 }
