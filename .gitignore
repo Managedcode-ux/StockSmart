@@ -2,3 +2,5 @@ node_modules
 package-lock.json
 tsconfig.json
 .env
+test.js
+tempCodeRunnerFile.js
