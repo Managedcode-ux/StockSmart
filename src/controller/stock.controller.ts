@@ -4,8 +4,9 @@ import logger from "../utils/logger";
 
 export async function addStockToDbHandler(req:Request,res:Response){
   try{
-    const insertionStatus = await addStockToDb(req.body)
-    return res.status(200)
+    const insertionData:any = await addStockToDb(req.body)
+    const {success,copydata} = insertionData
+    res.status(200).send({AddedData:success,DuplicateData:copydata})
   }catch(err:any){
     logger.error(err);
     return res.status(400).send(err.message)

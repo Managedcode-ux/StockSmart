@@ -10,10 +10,13 @@ export interface stockDocument extends stockAddition,mongoose.Document{
   updatedAt:Date,
 }
 
+
 const stockSchema = new mongoose.Schema({
   company_name:{type:String,required:true,},
   company_code:{type:String,required:true,unique:true}
 },{timestamps:true})
+
+stockSchema.index({company_name:1})
 
 stockSchema.pre("save",async function (next){
   const stockDetails = this as stockAddition
