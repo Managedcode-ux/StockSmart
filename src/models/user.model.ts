@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Schema,model } from "mongoose";
 import bcrypt from "bcrypt";
 
 
@@ -8,6 +9,11 @@ export interface userInput
   email: string,
   username:string,
   password:string,
+}
+
+export interface WatchList{
+  userId:Schema.Types.ObjectId,
+  company_code_list:string[]
 }
 
 export interface userDocument extends userInput,mongoose.Document{
@@ -47,7 +53,5 @@ userSchema.methods.comparePassword = async function (candidatePassword:string):P
 }
 
 const UserModel= mongoose.model<userDocument>('User',userSchema)
-
-
 
 export default UserModel

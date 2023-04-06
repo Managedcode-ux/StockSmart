@@ -5,7 +5,7 @@ import { createUserHandler,loginUserHandler,getCurrentUserHandler,updateCurrentU
 
 //STOCKS PATH IMPORTS
 
-import { addStockToDbHandler } from "./controller/stock.controller"
+import { addStockToDbHandler,getWatchListStocksHandler } from "./controller/stock.controller"
 
 //MIDDLEWARE IMPORTS
 import { authenticateToken } from "./middleware/authenticate";
@@ -20,6 +20,9 @@ import { createSessionSchema } from "./schema/login.user.schema";
 function routes(app:Express){
   app.get('/healthcheck', (req, res) => res.sendStatus(200));
 
+  //ADMIN API's
+  app.post('/api/stocks/addStockToDb',addStockToDbHandler) //API TO ADD STOCKS TO DATABASE
+
   //USERS
   app.post('/api/user/createUsers',validateResource(createUserSchema),createUserHandler)
   app.post('/api/user/loginUser',validateResource(createSessionSchema),loginUserHandler)
@@ -28,8 +31,10 @@ function routes(app:Express){
   app.delete('/api/user/deleteUser',[authenticateToken],deleteCurrentUserHandler)
 
   //STOCKS
-  app.get('/api/stocks/getFavStocks',[authenticateToken])
-  app.post('/api/stocks/addStockToDb',addStockToDbHandler)
+
+  // "API TO GET FAV/WATCHLIST STOCKS"
+  app.get('/api/stocks/getWatchListStocks',[authenticateToken],getWatchListStocksHandler) // !  "Convert all 'company names' to lowercase and 'company code' to uppercase before sending to backend" 
+  
   
   app.post('/api/testRoute',authenticateToken,(req,res)=>{
     console.log(req.user)
