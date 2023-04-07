@@ -18,8 +18,6 @@ interface watchListI{
 }
 
 
-
-
 export async function addStockToDb(data:object){
   let copydata:string[] = []
   let success:string[] = [];
@@ -37,39 +35,70 @@ export async function addStockToDb(data:object){
 }
 
 
-async function addUserWatchListToDB(userId:string,companies:string[]){
-  const searchQuery = {user_Id:userId}
-  const updateQuery = {$addToSet:{company_code_list:{$each:companies}}}
-  const options = {upsert:true,new:true}
-  watchListModel.findOneAndUpdate(searchQuery,updateQuery,options)
-  .then(res=>console.log(res))
-  .catch(err=>console.log(err))
+async function addUserWatchListToDB(userId: string, companies: string[]) {
+  const searchQuery = { user_Id: userId }
+  const updateQuery = { $addToSet: { company_code_list: { $each: companies } } }
+  const options = { upsert: true, new: true }
+
+  try {
+    const result = await watchListModel.findOneAndUpdate(searchQuery, updateQuery, options)
+    return { stat: result, error: null }
+  } catch (err) {
+    console.error(err)
+    return { stat: null, error: err }
+  }
+}
+
+
+async function destructureCompanyListAndCode(userId:string,codeAndNameArray:[string,string[]]){
+  let finalData
+  let error
+  const [header,companies] = codeAndNameArray
+  
+  if(header === "CompanyNameList"){
+    const respectiveCodes :string[] = []
+    
+    try {
+      const res = await StockModel.find({company_name:{$in:companies}})
+      for(const obj of res){
+        respectiveCodes.push(obj.company_code)
+      }
+      const returnedData = await addUserWatchListToDB(userId,respectiveCodes)
+      finalData = returnedData.stat
+    } catch (err) {
+      error = err
+    }
+    
+  }
+  else{
+    try {
+      const returnedData = await addUserWatchListToDB(userId,companies)
+      finalData = returnedData.stat
+    } catch (err) {
+      error = err
+    }
+  }  
+  return {data:finalData,errors:error}
 }
 
 
 
-export async function addUserWatchList(user:userI,watchList:Partial<watchListI>){
-  const userId = user._id
-  
-  Object.entries(watchList).forEach(([header,companies]) => {
-    
-    if(header === "CompanyNameList"){
-      const respectiveCodes :string[] = []
-      
-      StockModel.find({company_name:{$in:companies}})
-      .then((res)=>{
-        for(const obj of res){
-          respectiveCodes.push(obj.company_code)
-        }
-        
-        addUserWatchListToDB(userId,respectiveCodes)
 
-      })
-      .catch(err=>console.log(err))
-      
-    }
-    else{
-      addUserWatchListToDB(userId,companies)
-    }  
-  })
+export async function addUserWatchList(user:userI,watchList:Partial<watchListI>){
+
+  const userId = user._id
+  let finalResult:unknown
+  let errors:unknown
+
+  const promises = Object.entries(watchList).map((pair) => destructureCompanyListAndCode(userId,pair))
+
+  try {
+    const results = await Promise.all(promises)
+    finalResult = results.map(result => result.data)
+    errors = results.map(result => result.errors)
+  } catch (err) {
+    errors = err
+  }
+
+  return {data:finalResult,errors:errors}
 }
